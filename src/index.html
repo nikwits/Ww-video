@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wits + Watts intro</title>
+<style>
+  @font-face { font-family: "Spectral"; font-style: italic; font-weight: 400;
+    src: url(/node_modules/@fontsource/spectral/files/spectral-latin-400-italic.woff2) format("woff2"); }
+  @font-face { font-family: "Plex Mono"; font-style: normal; font-weight: 400;
+    src: url(/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Plex Mono"; font-style: normal; font-weight: 500;
+    src: url(/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2) format("woff2"); }
+
+  :root {
+    --ink: #0F0E14;
+    --paper: #ECEAF2;
+    --mute: #8A8794;
+    --signal: #C4197C;
+    --signal-hi: #EC5BA8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--ink); color: var(--paper); }
+  .serif { font-family: "Spectral", serif; font-style: italic; font-weight: 400; }
+  .mono  { font-family: "Plex Mono", monospace; font-weight: 400; }
+  .pink  { color: var(--signal-hi); }
+
+  #bg { position: absolute; inset: 0; }
+  #vignette { position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%); }
+  .scene { position: absolute; inset: 0; visibility: hidden; }
+
+  /* word-mask reveal */
+  .w  { display: inline-block; overflow: hidden; vertical-align: top; padding: 0 .06em .14em; margin: 0 -.06em -.14em; }
+  .wi { display: inline-block; will-change: transform; }
+
+  /* scene 1 */
+  #s1a { position: absolute; left: 0; right: 0; top: 380px; text-align: center; font-size: 104px; line-height: 1.1; }
+  #s1b { position: absolute; left: 0; right: 0; top: 560px; text-align: center; font-size: 84px; line-height: 1.1; white-space: pre; }
+  #cursor { display: inline-block; width: .55em; height: .95em; background: var(--signal-hi); vertical-align: -.12em; margin-left: .08em; }
+
+  /* scene 2 */
+  #s2top { position: absolute; left: 200px; top: 250px; width: 1520px; display: flex; align-items: center; gap: 56px; }
+  #num { font-size: 300px; line-height: .9; letter-spacing: -.04em; color: var(--signal-hi); font-weight: 500; transform-origin: left center; white-space: nowrap; }
+  #num .pct { font-size: .55em; vertical-align: .55em; letter-spacing: 0; }
+  #s2cap { font-size: 64px; line-height: 1.15; max-width: 860px; }
+  #bar { position: absolute; left: 200px; top: 690px; width: 1520px; height: 30px; display: flex; gap: 6px; }
+  .seg { position: relative; height: 100%; }
+  .seg .fill { position: absolute; inset: 0; transform-origin: left center; }
+  .seg .lab { position: absolute; top: 46px; left: 0; font-size: 21px; letter-spacing: .12em; color: var(--mute); white-space: nowrap; }
+  #g10 { width: 10%; } #g10 .lab { top: -38px; } #g20 { width: 20%; } #g70 { flex: 1; }
+  #g70 .outline { position: absolute; inset: 0; border: 2px solid var(--signal); }
+  #s2b { position: absolute; left: 200px; top: 850px; font-size: 50px; }
+  #src { position: absolute; left: 200px; bottom: 60px; font-size: 18px; letter-spacing: .16em; color: var(--mute); }
+
+  /* scene 3 */
+  #roll { position: absolute; left: 0; right: 0; top: 350px; height: 170px; display: flex; justify-content: center; align-items: center; transform-origin: 50% 50%; }
+  .col { width: 840px; height: 170px; overflow: hidden; }
+  .col.left { text-align: right; }
+  .strip div { height: 170px; line-height: 170px; font-size: 110px; white-space: nowrap; }
+  .col.left .strip div { font-size: 136px; }
+  #plus { width: 150px; text-align: center; font-size: 124px; line-height: 170px; color: var(--signal-hi); }
+  #s3a { position: absolute; left: 0; right: 0; top: 660px; text-align: center; font-size: 60px; }
+  #s3b { position: absolute; left: 0; right: 0; top: 760px; text-align: center; font-size: 46px; }
+
+  /* scene 4 */
+  #s4lab { position: absolute; left: 200px; top: 190px; font-size: 26px; letter-spacing: .3em; color: var(--signal-hi); }
+  #weeks { position: absolute; left: 200px; top: 250px; display: flex; gap: 12px; }
+  .wk { width: 96px; }
+  .wk .blk { height: 12px; background: #2A2833; position: relative; overflow: hidden; }
+  .wk .blk i { position: absolute; inset: 0; background: var(--signal); transform-origin: left center; }
+  .wk span { display: block; margin-top: 10px; font-size: 16px; letter-spacing: .14em; color: var(--mute); }
+  #s4a { position: absolute; left: 200px; top: 330px; font-size: 180px; line-height: 1.05; }
+  #s4b { position: absolute; left: 200px; top: 540px; font-size: 156px; line-height: 1.1; }
+  #s4c { position: absolute; left: 200px; top: 780px; font-size: 74px; line-height: 1.15; }
+
+  /* scene 5 */
+  #logo { position: absolute; left: 0; right: 0; top: 330px; display: flex; justify-content: center; align-items: baseline; font-size: 176px; line-height: 1.2; }
+  #logo span { display: inline-block; }
+  #lp { color: var(--signal-hi); margin: 0 .32em; font-size: .9em; }
+  #cta { position: absolute; left: 50%; top: 650px; transform: translateX(-50%); }
+  #ctaBox { position: relative; display: inline-block; padding: 24px 52px; border: 2px solid var(--signal-hi); border-radius: 999px; font-size: 38px; overflow: hidden; white-space: nowrap; }
+  #ctaFill { position: absolute; inset: 0; background: var(--signal); transform-origin: left center; }
+  #ctaTxt { position: relative; }
+  #url { position: absolute; left: 0; right: 0; top: 820px; text-align: center; font-size: 30px; letter-spacing: .12em; color: var(--mute); }
+
+  #wipe { position: absolute; inset: 0; background: var(--signal); transform: translateX(-100%); }
+  #flash { position: absolute; inset: 0; background: radial-gradient(circle at 50% 42%, rgba(236,91,168,.55), rgba(236,91,168,0) 45%); opacity: 0; }
+</style>
+</head>
+<body>
+<canvas id="bg" width="1920" height="1080"></canvas>
+
+<section class="scene" id="s1">
+  <div id="s1a" class="serif"></div>
+  <div id="s1b" class="mono"><span id="typed"></span><span id="cursor"></span></div>
+</section>
+
+<section class="scene" id="s2">
+  <div id="s2top">
+    <div id="num" class="mono"><span id="numv">0</span><span class="pct">%</span></div>
+    <div id="s2cap" class="serif"></div>
+  </div>
+  <div id="bar">
+    <div class="seg" id="g10"><div class="fill"></div><div class="lab mono">ALGORITHMS 10%</div></div>
+    <div class="seg" id="g20"><div class="fill"></div><div class="lab mono">TECH + DATA 20%</div></div>
+    <div class="seg" id="g70"><div class="outline"></div><div class="fill"></div><div class="lab mono">PEOPLE, WORKFLOWS, DECISIONS 70%</div></div>
+  </div>
+  <div id="s2b" class="mono"></div>
+  <div id="src" class="mono">SOURCE: BCG 10-20-70 PRINCIPLE</div>
+</section>
+
+<section class="scene" id="s3">
+  <div id="roll">
+    <div class="col left"><div class="strip serif" id="stripL"></div></div>
+    <div id="plus" class="mono">+</div>
+    <div class="col right"><div class="strip mono" id="stripR"></div></div>
+  </div>
+  <div id="s3a" class="serif"></div>
+  <div id="s3b" class="mono"></div>
+</section>
+
+<section class="scene" id="s4">
+  <div id="s4lab" class="mono">THE BASELINE</div>
+  <div id="weeks"></div>
+  <div id="s4a" class="serif"></div>
+  <div id="s4b" class="mono"></div>
+  <div id="s4c" class="serif"></div>
+</section>
+
+<section class="scene" id="s5">
+  <div id="logo"><span id="lw" class="serif">wits</span><span id="lp" class="mono">+</span><span id="lt" class="mono">watts</span></div>
+  <div id="cta" class="mono"><div id="ctaBox"><span id="ctaFill"></span><span id="ctaTxt">Get your baseline &rarr;</span></div></div>
+  <div id="url" class="mono">witsandwatts.ai</div>
+</section>
+
+<div id="flash"></div>
+<div id="wipe"></div>
+<div id="vignette"></div>
+
+<script>
+const W = 1920, H = 1080, DURATION = 20;
+const $ = (s) => document.querySelector(s);
+
+// ---------- easing + timing helpers ----------
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, x) => a + (b - a) * x;
+const outExpo = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));
+const inExpo = (x) => (x <= 0 ? 0 : Math.pow(2, 10 * x - 10));
+const outCubic = (x) => 1 - Math.pow(1 - x, 3);
+const inOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const outBack = (x) => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+
+// Splits text into masked words. Words wrapped in *asterisks* are pink.
+function words(el, text) {
+  el.innerHTML = text.split(" ").map((w) => {
+    const pink = w.startsWith("*");
+    w = w.replace(/\*/g, "");
+    return `<span class="w"><span class="wi${pink ? " pink" : ""}">${w}</span></span>`;
+  }).join(" ");
+  return [...el.querySelectorAll(".wi")];
+}
+// Masked rise-in, one word after another.
+function riseWords(ws, t, start, stagger = 0.08, dur = 0.55) {
+  ws.forEach((w, i) => {
+    const p = outExpo(P(t, start + i * stagger, start + i * stagger + dur));
+    w.style.transform = `translateY(${(1 - p) * 115}%)`;
+  });
+}
+
+// ---------- build DOM ----------
+const s1a = words($("#s1a"), "You've spent the money on AI.");
+const s2cap = words($("#s2cap"), "of AI's value comes from the people, workflows and decisions around it.");
+const s2b = words($("#s2b"), "Most organisations fund the other *30%.");
+const s3a = words($("#s3a"), "Judgement decides what to build.");
+const s3b = words($("#s3b"), "Capacity builds it.");
+const s4a = words($("#s4a"), "Six weeks.");
+const s4b = words($("#s4b"), "Fixed fee.");
+const s4c = words($("#s4c"), "A score you can take to *the *board.");
+
+const PAIRS = [
+  ["people", "machines"], ["taste", "intelligence"], ["judgement", "power"],
+  ["instinct", "evidence"], ["craft", "scale"], ["your people", "more power"], ["wits", "watts"],
+];
+$("#stripL").innerHTML = PAIRS.map((p) => `<div>${p[0]}</div>`).join("");
+$("#stripR").innerHTML = PAIRS.map((p) => `<div>${p[1]}</div>`).join("");
+$("#weeks").innerHTML = [1, 2, 3, 4, 5, 6].map((n) => `<div class="wk"><div class="blk"><i></i></div><span class="mono">WK ${n}</span></div>`).join("");
+const wkFills = [...document.querySelectorAll(".wk i")];
+const wkLabs = [...document.querySelectorAll(".wk span")];
+
+// ---------- scene windows ----------
+const WIPE1 = 3.55, S3_IN = 7.55, WIPE2 = 12.55, S5_IN = 16.15;
+const scenes = [
+  ["#s1", 0, WIPE1], ["#s2", WIPE1, S3_IN], ["#s3", S3_IN, WIPE2], ["#s4", WIPE2, S5_IN], ["#s5", S5_IN, 99],
+];
+
+// Roller snap times (accelerating), landing on wits + watts.
+const SNAPS = [8.25, 8.62, 8.95, 9.24, 9.5, 9.76];
+function rollPos(t, lag) {
+  let pos = 0;
+  SNAPS.forEach((s, k) => {
+    const last = k === SNAPS.length - 1;
+    const d = last ? 0.42 : 0.24;
+    const p = P(t, s + lag, s + lag + d);
+    pos += last ? outBack(p) : outExpo(p);
+  });
+  return pos;
+}
+const LAND = SNAPS[SNAPS.length - 1];
+
+// ---------- canvas background ----------
+const cv = $("#bg"), cx = cv.getContext("2d");
+
+function mulberry(a) { return () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const rnd = mulberry(7);
+const JITTER = Array.from({ length: 4000 }, () => rnd());
+
+function drawGrid(t, alpha) {
+  if (alpha <= 0) return;
+  const g = 48, off = (t * 7) % g;
+  cx.fillStyle = `rgba(236,234,242,${0.06 * alpha})`;
+  for (let y = -g + off; y < H + g; y += g)
+    for (let x = -g + off * 0.5; x < W + g; x += g) cx.fillRect(x, y, 2, 2);
+}
+
+// Flat signal line with a travelling spark (the zigzag pulse).
+function drawSignal(t, alpha) {
+  if (alpha <= 0) return;
+  const y0 = 860, head = lerp(-300, W + 300, inOut(P(t, 0.1, 3.4)));
+  cx.lineWidth = 2;
+  cx.strokeStyle = `rgba(236,91,168,${0.55 * alpha})`;
+  cx.beginPath();
+  for (let x = 0; x <= W; x += 4) {
+    const d = x - head;
+    let y = y0;
+    if (Math.abs(d) < 90) {
+      // zigzag spark: a few sharp peaks decaying from centre
+      const k = d / 90;
+      y -= Math.sin(k * Math.PI * 3) * 70 * (1 - Math.abs(k)) * (d < 0 ? 0.6 : 1);
+    }
+    x === 0 ? cx.moveTo(x, y) : cx.lineTo(x, y);
+  }
+  cx.stroke();
+  const glow = cx.createRadialGradient(head, y0, 0, head, y0, 220);
+  glow.addColorStop(0, `rgba(236,91,168,${0.35 * alpha})`);
+  glow.addColorStop(1, "rgba(236,91,168,0)");
+  cx.fillStyle = glow;
+  cx.fillRect(head - 220, y0 - 220, 440, 440);
+}
+
+// Particle wave (the brand's signal wave), peaking at the junction (centre).
+function drawWave(t, cy, amp, alpha, spread = 0.2) {
+  if (alpha <= 0) return;
+  cx.save();
+  cx.globalCompositeOperation = "lighter";
+  const STRANDS = 9;
+  let j = 0;
+  for (let s = 0; s < STRANDS; s++) {
+    const sp = 0.55 + 0.45 * Math.sin(s * 1.7 + t * 0.9);
+    for (let x = 0; x <= W; x += 6, j++) {
+      const u = (x - W / 2) / W;
+      const env = Math.exp(-(u * u) / (2 * spread * spread));
+      const a = amp * (env * 200 + 10);
+      const y = cy + a * sp * (0.62 * Math.sin(x * 0.0085 + t * 2.4 + s * 0.45) + 0.38 * Math.sin(x * 0.019 - t * 1.6 + s * 0.8));
+      const jit = (JITTER[j % JITTER.length] - 0.5) * 10 * env;
+      const al = alpha * (0.18 + 0.7 * env) * (0.6 + 0.4 * JITTER[(j * 7) % JITTER.length]);
+      cx.fillStyle = `rgba(214,52,146,${al})`;
+      const r = 1.4 + 1.6 * env;
+      cx.fillRect(x - r / 2, y + jit - r / 2, r, r);
+    }
+  }
+  const glow = cx.createRadialGradient(W / 2, cy, 0, W / 2, cy, 520);
+  glow.addColorStop(0, `rgba(196,25,124,${0.22 * alpha * amp})`);
+  glow.addColorStop(1, "rgba(196,25,124,0)");
+  cx.fillStyle = glow;
+  cx.fillRect(0, cy - 520, W, 1040);
+  cx.restore();
+}
+
+function drawBackground(t) {
+  cx.fillStyle = "#0F0E14";
+  cx.fillRect(0, 0, W, H);
+  drawGrid(t, 1);
+  drawSignal(t, 1 - P(t, 3.2, 3.5));
+
+  // wave: bursts in on the wits + watts landing, rides low in scene 4, returns for the end card
+  const s3amp = outExpo(P(t, LAND - 0.1, LAND + 0.5)) * lerp(1, 0.75, P(t, LAND + 0.6, LAND + 1.6));
+  if (t >= S3_IN && t < WIPE2) drawWave(t, 435, s3amp, Math.min(1, s3amp * 2.5));
+  if (t >= WIPE2 && t < S5_IN) drawWave(t, 1000, 0.45, 0.4 * (1 - P(t, S5_IN - 0.3, S5_IN)), 0.35);
+  if (t >= S5_IN) drawWave(t, 435, 0.55 * outCubic(P(t, S5_IN, S5_IN + 1.2)), 0.8);
+}
+
+// ---------- per-frame render ----------
+function renderAt(t) {
+  drawBackground(t);
+  for (const [id, a, b] of scenes) $(id).style.visibility = t >= a && t < b ? "visible" : "hidden";
+
+  // Pink wipes between scenes 1->2 and 3->4
+  const wipe = (T, dir) => {
+    if (t < T - 0.22 || t > T + 0.26) return null;
+    const x = t < T ? lerp(-100, 0, inExpo(P(t, T - 0.22, T)) ** 0.6) : lerp(0, 100, outExpo(P(t, T, T + 0.26)));
+    return `translateX(${x * dir}%)`;
+  };
+  $("#wipe").style.transform = wipe(WIPE1, 1) || wipe(WIPE2, -1) || "translateX(-100%)";
+
+  // --- Scene 1: hook ---
+  if (t < WIPE1) {
+    riseWords(s1a, t, 0.2, 0.09, 0.6);
+    const up = inOut(P(t, 1.45, 1.85));
+    $("#s1a").style.transform = `translateY(${-70 * up}px)`;
+    $("#s1a").style.opacity = lerp(1, 0.5, up);
+
+    const full = "Can you prove it worked?";
+    const n = Math.floor(lerp(0, full.length, P(t, 1.8, 2.65)));
+    const a = full.indexOf("prove"), b = a + 5;
+    $("#typed").innerHTML = full.slice(0, Math.min(n, a)) +
+      (n > a ? `<span class="pink">${full.slice(a, Math.min(n, b))}</span>` : "") + full.slice(b, Math.max(n, b));
+    $("#s1b").style.opacity = t >= 1.8 ? 1 : 0;
+    const typing = t < 2.7;
+    $("#cursor").style.opacity = typing || Math.floor((t - 2.7) * 3.2) % 2 === 1 ? 1 : 0;
+    const punch = outExpo(P(t, 2.65, 2.9));
+    $("#s1b").style.transform = `scale(${1 + 0.06 * Math.sin(punch * Math.PI)})`;
+  }
+
+  // --- Scene 2: the 70% stat ---
+  if (t >= WIPE1 && t < S3_IN) {
+    const numIn = outExpo(P(t, WIPE1 + 0.05, WIPE1 + 0.4));
+    $("#num").style.transform = `scale(${lerp(1.25, 1, numIn)})`;
+    $("#num").style.opacity = numIn;
+    $("#numv").textContent = Math.round(70 * outExpo(P(t, WIPE1 + 0.1, WIPE1 + 1.1)));
+    riseWords(s2cap, t, WIPE1 + 0.35, 0.05, 0.5);
+
+    const grow = (id, a, b) => { $(`${id} .fill`).style.transform = `scaleX(${outExpo(P(t, a, b))})`; };
+    grow("#g10", 4.3, 4.65); grow("#g20", 4.45, 4.85); grow("#g70", 4.6, 5.3);
+    ["#g10", "#g20", "#g70"].forEach((id, i) => { $(`${id} .lab`).style.opacity = P(t, 4.6 + i * 0.12, 4.9 + i * 0.12); });
+
+    // "Most organisations fund the other 30%": the 30% lights up, the 70% goes hollow
+    const flip = inOut(P(t, 5.75, 6.15));
+    const c30 = `rgb(${lerp(58, 236, flip)},${lerp(56, 234, flip)},${lerp(69, 242, flip)})`;
+    $("#g10 .fill").style.background = c30;
+    $("#g20 .fill").style.background = `rgb(${lerp(90, 236, flip)},${lerp(87, 234, flip)},${lerp(102, 242, flip)})`;
+    $("#g70 .fill").style.background = "#C4197C";
+    $("#g70 .fill").style.opacity = lerp(1, 0.14, flip);
+    $("#g70 .outline").style.opacity = P(t, 5.3, 5.4);
+    riseWords(s2b, t, 5.75, 0.07, 0.5);
+    $("#src").style.opacity = P(t, 4.8, 5.3) * 0.9;
+
+    const out = inExpo(P(t, S3_IN - 0.3, S3_IN));
+    $("#s2").style.opacity = 1 - out;
+    $("#s2").style.transform = `scale(${1 + 0.08 * out})`;
+  }
+
+  // --- Scene 3: the junction ---
+  if (t >= S3_IN && t < WIPE2) {
+    const inn = outExpo(P(t, S3_IN, S3_IN + 0.45));
+    const pL = rollPos(t, 0), pR = rollPos(t, 0.05);
+    $("#stripL").style.transform = `translate(${-80 * (1 - inn)}px, ${-pL * 170}px)`;
+    $("#stripR").style.transform = `translate(${80 * (1 - inn)}px, ${-pR * 170}px)`;
+    $("#roll").style.opacity = inn;
+    const landed = outExpo(P(t, LAND + 0.1, LAND + 0.8));
+    const pulse = Math.sin(P(t, LAND, LAND + 0.35) * Math.PI);
+    $("#roll").style.transform = `scale(${1 + 0.16 * landed + 0.05 * pulse})`;
+    $("#plus").style.transform = `rotate(${pL * 90}deg) scale(${1 + 0.35 * pulse})`;
+    $("#flash").style.opacity = t > LAND - 0.05 ? (1 - P(t, LAND, LAND + 0.9)) * P(t, LAND - 0.05, LAND + 0.05) : 0;
+    riseWords(s3a, t, 10.5, 0.06, 0.5);
+    riseWords(s3b, t, 11.15, 0.07, 0.5);
+  } else {
+    $("#flash").style.opacity = 0;
+  }
+
+  // --- Scene 4: the offer ---
+  if (t >= WIPE2 && t < S5_IN) {
+    $("#s4lab").style.opacity = P(t, 12.65, 12.85);
+    wkFills.forEach((f, i) => { f.style.transform = `scaleX(${outExpo(P(t, 12.75 + i * 0.09, 12.95 + i * 0.09))})`; });
+    wkLabs.forEach((l, i) => { l.style.opacity = P(t, 12.75 + i * 0.09, 12.95 + i * 0.09); });
+    riseWords(s4a, t, 12.72, 0.12, 0.55);
+    riseWords(s4b, t, 13.4, 0.12, 0.55);
+    riseWords(s4c, t, 14.1, 0.07, 0.5);
+    const out = inExpo(P(t, S5_IN - 0.3, S5_IN));
+    $("#s4").style.opacity = 1 - out;
+    $("#s4").style.transform = `translateX(${-90 * out}px)`;
+  }
+
+  // --- Scene 5: end card ---
+  if (t >= S5_IN) {
+    const a = outExpo(P(t, S5_IN + 0.05, S5_IN + 0.75));
+    $("#lw").style.transform = `translateX(${-140 * (1 - a)}px)`;
+    $("#lw").style.opacity = a;
+    $("#lt").style.transform = `translateX(${140 * (1 - a)}px)`;
+    $("#lt").style.opacity = a;
+    const pp = outBack(P(t, S5_IN + 0.35, S5_IN + 0.85));
+    $("#lp").style.transform = `rotate(${(1 - pp) * -180}deg) scale(${pp})`;
+
+    const c = outExpo(P(t, 17.0, 17.5));
+    $("#cta").style.opacity = c;
+    $("#cta").style.transform = `translateX(-50%) translateY(${30 * (1 - c)}px)`;
+    $("#ctaFill").style.transform = `scaleX(${outExpo(P(t, 17.35, 18.0))})`;
+    $("#url").style.opacity = P(t, 17.6, 18.1);
+  }
+}
+
+window.renderAt = renderAt;
+window.DURATION = DURATION;
+
+// Live preview when opened directly in a browser.
+if (!navigator.webdriver) {
+  const t0 = performance.now();
+  const loop = () => { renderAt(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+  document.fonts.ready.then(loop);
+}
+</script>
+</body>
+</html>
