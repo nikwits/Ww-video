@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "render": "node render.mjs",
-    "stills": "node render.mjs --stills"
+    "stills": "node render.mjs"
   },
   "repository": {
     "type": "git",

@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wits + Watts baseline</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* scene 1: hook */
+  #s1a { position: absolute; left: 0; right: 0; top: 390px; text-align: center; font-size: 82px; line-height: 1.1; }
+  #s1b { position: absolute; left: 0; right: 0; top: 560px; text-align: center; font-size: 58px; line-height: 1.1; }
+
+  /* scene 2: the promise */
+  #s2lab { position: absolute; left: 0; right: 0; top: 280px; text-align: center; font-size: 26px; letter-spacing: .3em; color: var(--signal-hi); }
+  #s2a { position: absolute; left: 0; right: 0; top: 350px; text-align: center; font-size: 150px; line-height: 1.1; }
+  #s2b { position: absolute; left: 0; right: 0; top: 540px; text-align: center; font-size: 132px; line-height: 1.1; }
+
+  /* scene 3: week by week */
+  #s3lab { position: absolute; left: 200px; top: 120px; font-size: 26px; letter-spacing: .3em; color: var(--signal-hi); }
+  #weekHead { position: absolute; left: 200px; top: 190px; width: 1520px; display: flex; }
+  #weekHead div { flex: 1; font-size: 20px; letter-spacing: .16em; color: var(--mute); padding-left: 12px; border-left: 1px solid rgba(236,234,242,.12); height: 740px; }
+  .row { position: absolute; left: 200px; width: 1520px; height: 150px; }
+  .track { position: absolute; top: 0; height: 10px; background: #2A2833; transform-origin: left center; }
+  .track i { position: absolute; inset: 0; background: var(--signal); transform-origin: left center; }
+  .rt { position: absolute; top: 30px; white-space: nowrap; }
+  .rt .h { font-size: 50px; line-height: 1.15; }
+  .rt .d { font-size: 25px; letter-spacing: .06em; color: var(--mute); margin-top: 10px; }
+  .rt.right { text-align: right; }
+  #play { position: absolute; top: 180px; width: 2px; height: 760px; background: var(--signal-hi); box-shadow: 0 0 18px 4px rgba(236,91,168,.55); }
+
+  /* scene 4: what you get */
+  #s4lab { position: absolute; left: 200px; top: 180px; font-size: 26px; letter-spacing: .3em; color: var(--signal-hi); }
+  .get { position: absolute; left: 200px; width: 1520px; height: 200px; display: flex; align-items: center; }
+  .get .n { width: 150px; font-size: 40px; color: var(--signal-hi); letter-spacing: .08em; }
+  .get .t { font-size: 96px; line-height: 1.15; }
+  .get .rule { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: rgba(236,234,242,.18); transform-origin: left center; }
+
+  /* scene 5: price */
+  #s5a { position: absolute; left: 0; right: 0; top: 250px; text-align: center; font-size: 110px; }
+  #price { position: absolute; left: 0; right: 0; top: 400px; text-align: center; font-size: 190px; line-height: 1.1; font-weight: 500; color: var(--signal-hi); letter-spacing: -.02em; }
+  #price .from { font-size: .42em; font-weight: 400; color: var(--paper); letter-spacing: 0; margin-right: .35em; vertical-align: .28em; }
+  #priceNote { position: absolute; left: 0; right: 0; top: 640px; text-align: center; font-size: 22px; letter-spacing: .24em; color: var(--mute); }
+  #s5b { position: absolute; left: 0; right: 0; top: 760px; text-align: center; font-size: 56px; }
+</style>
+</head>
+<body>
+<canvas id="bg" width="1920" height="1080"></canvas>
+
+<section class="scene" id="s1">
+  <div id="s1a" class="serif"></div>
+  <div id="s1b" class="mono"></div>
+</section>
+
+<section class="scene" id="s2">
+  <div id="s2lab" class="mono">THE BASELINE</div>
+  <div id="s2a" class="serif"></div>
+  <div id="s2b" class="mono"></div>
+</section>
+
+<section class="scene" id="s3">
+  <div id="s3lab" class="mono">WEEK BY WEEK</div>
+  <div id="weekHead" class="mono"></div>
+  <div id="rows"></div>
+  <div id="play"></div>
+</section>
+
+<section class="scene" id="s4">
+  <div id="s4lab" class="mono">WHAT YOU GET</div>
+  <div id="gets"></div>
+</section>
+
+<section class="scene" id="s5">
+  <div id="s5a" class="serif"></div>
+  <div id="price" class="mono"><span class="from">from</span>$9,500</div>
+  <div id="priceNote" class="mono">NZD &middot; EXCL. GST &middot; PRICED BY ORGANISATION SIZE</div>
+  <div id="s5b" class="serif"></div>
+</section>
+
+<section class="scene" id="s6">
+  <div id="logo"><span id="lw" class="serif">wits</span><span id="lp" class="mono">+</span><span id="lt" class="mono">watts</span></div>
+  <div id="cta" class="mono"><div id="ctaBox"><span id="ctaFill"></span><span id="ctaTxt">Book a 30-minute call &rarr;</span></div></div>
+  <div id="url" class="mono">witsandwatts.ai</div>
+</section>
+
+<div id="flash"></div>
+<div id="wipe"></div>
+<div id="vignette"></div>
+
+<script src="shared.js"></script>
+<script>
+const DURATION = 25;
+
+// ---------- scene windows ----------
+const WIPE1 = 4.1, S3_IN = 7.3, WIPE2 = 14.6, WIPE3 = 18.7, S6_IN = 21.4;
+const scenes = [
+  ["#s1", 0, WIPE1], ["#s2", WIPE1, S3_IN], ["#s3", S3_IN, WIPE2], ["#s4", WIPE2, WIPE3], ["#s5", WIPE3, S6_IN], ["#s6", S6_IN, 99],
+];
+
+// ---------- build DOM ----------
+const s1a = words($("#s1a"), "Most of what we find is no surprise to your people.");
+const s1b = words($("#s1b"), "It's a surprise to whoever *signed *off *the *spend.");
+const s2a = words($("#s2a"), "Six weeks to an");
+const s2b = words($("#s2b"), "*honest baseline.");
+const s5a = words($("#s5a"), "Fixed fee.");
+const s5b = words($("#s5b"), "About 12 hours of your leadership's time.");
+
+// Week-by-week timeline: [first week, last week, heading, detail]
+const COL = 1520 / 6, ROW_TOP = 270, ROW_GAP = 160;
+const PHASES = [
+  [1, 2, "We talk to your people", "12 TO 20 CONVERSATIONS, TOP TO FRONT LINE"],
+  [2, 3, "We look at your data and governance", "WHAT EXISTS, WHO OWNS IT, WHAT'S ALLOWED"],
+  [3, 4, "We follow how work gets done", "REAL WORKFLOWS, END TO END"],
+  [5, 6, "We score it and write it up", "READY FOR THE BOARD"],
+];
+$("#weekHead").innerHTML = [1, 2, 3, 4, 5, 6].map((n) => `<div>WK ${n}</div>`).join("");
+const weekLabs = [...document.querySelectorAll("#weekHead div")];
+$("#rows").innerHTML = PHASES.map(([a, b, h, d], i) => {
+  const left = (a - 1) * COL, width = (b - a + 1) * COL;
+  const last = i === PHASES.length - 1;
+  const textPos = last ? `right: ${1520 - left - width}px` : `left: ${left}px`;
+  return `<div class="row" style="top:${ROW_TOP + i * ROW_GAP}px">
+    <div class="track" style="left:${left + 6}px;width:${width - 12}px"><i></i></div>
+    <div class="rt${last ? " right" : ""}" style="${textPos}"><div class="h serif"></div><div class="d mono">${d}</div></div>
+  </div>`;
+}).join("");
+const rows = [...document.querySelectorAll(".row")].map((r, i) => ({
+  track: r.querySelector(".track"), fill: r.querySelector(".track i"),
+  head: words(r.querySelector(".h"), PHASES[i][2]), detail: r.querySelector(".d"),
+  x0: (PHASES[i][0] - 1) * COL + 6, x1: PHASES[i][1] * COL - 6,
+}));
+
+// Playhead sweeps the six weeks.
+const PLAY_A = 7.6, PLAY_B = 13.9;
+const playX = (t) => 1520 * lerp(P(t, PLAY_A, PLAY_B), inOut(P(t, PLAY_A, PLAY_B)), 0.35);
+const timeAtX = (x) => { // inverse of playX by bisection, so text lands the moment the playhead arrives
+  let lo = PLAY_A, hi = PLAY_B;
+  for (let k = 0; k < 30; k++) { const m = (lo + hi) / 2; playX(m) < x ? (lo = m) : (hi = m); }
+  return lo;
+};
+rows.forEach((r) => { r.arrive = timeAtX(r.x0); });
+
+const GETS = ["A baseline.", "A Proof Score for *the *board.", "The 3 things to fix first."];
+$("#gets").innerHTML = GETS.map((g, i) =>
+  `<div class="get" style="top:${250 + i * 210}px"><div class="n mono">0${i + 1}</div><div class="t serif"></div><div class="rule"></div></div>`).join("");
+const gets = [...document.querySelectorAll(".get")].map((el, i) => ({
+  n: el.querySelector(".n"), rule: el.querySelector(".rule"), t: words(el.querySelector(".t"), GETS[i]), at: 14.8 + i * 0.75,
+}));
+
+// ---------- background ----------
+function drawBackground(t) {
+  clearBg();
+  drawGrid(t, 1);
+  drawSignal(t, 1 - P(t, 3.8, 4.1), 0.1, 3.9);
+  if (t >= WIPE1 && t < S3_IN) drawWave(t, 880, 0.55 * outCubic(P(t, 4.3, 5.2)), 0.55, 0.3);
+  if (t >= WIPE2 && t < WIPE3) drawWave(t, 1010, 0.4, 0.3, 0.35);
+  if (t >= WIPE3 && t < S6_IN) {
+    const hit = outExpo(P(t, 19.15, 19.6)) * lerp(1, 0.6, P(t, 19.7, 20.6));
+    drawWave(t, 505, hit, Math.min(0.75, hit * 2));
+  }
+  if (t >= S6_IN) drawWave(t, 435, 0.55 * outCubic(P(t, S6_IN, S6_IN + 1.2)), 0.8);
+}
+
+// ---------- per-frame render ----------
+function renderAt(t) {
+  drawBackground(t);
+  for (const [id, a, b] of scenes) $(id).style.visibility = t >= a && t < b ? "visible" : "hidden";
+  $("#wipe").style.transform = wipeAt(t, WIPE1, 1) || wipeAt(t, WIPE2, -1) || wipeAt(t, WIPE3, 1) || "translateX(-100%)";
+
+  // --- Scene 1: hook ---
+  if (t < WIPE1) {
+    riseWords(s1a, t, 0.2, 0.065, 0.55);
+    const up = inOut(P(t, 1.75, 2.15));
+    $("#s1a").style.transform = `translateY(${-60 * up}px)`;
+    $("#s1a").style.opacity = lerp(1, 0.5, up);
+    riseWords(s1b, t, 2.05, 0.07, 0.5);
+  }
+
+  // --- Scene 2: the promise ---
+  if (t >= WIPE1 && t < S3_IN) {
+    $("#s2lab").style.opacity = P(t, 4.2, 4.45);
+    riseWords(s2a, t, 4.25, 0.1, 0.6);
+    riseWords(s2b, t, 4.75, 0.14, 0.6);
+    const pulse = Math.sin(P(t, 5.1, 5.45) * Math.PI);
+    $("#s2b").style.transform = `scale(${1 + 0.04 * pulse})`;
+    const out = inExpo(P(t, S3_IN - 0.3, S3_IN));
+    $("#s2").style.opacity = 1 - out;
+    $("#s2").style.transform = `scale(${1 + 0.08 * out})`;
+  }
+
+  // --- Scene 3: week by week ---
+  if (t >= S3_IN && t < WIPE2) {
+    const inn = outExpo(P(t, S3_IN, S3_IN + 0.5));
+    $("#s3lab").style.opacity = inn;
+    $("#weekHead").style.opacity = inn;
+    const x = playX(t);
+    $("#play").style.left = `${200 + x}px`;
+    $("#play").style.opacity = P(t, PLAY_A - 0.2, PLAY_A) * (1 - P(t, PLAY_B + 0.1, PLAY_B + 0.4));
+    weekLabs.forEach((l, i) => { l.style.color = x >= i * COL ? "#EC5BA8" : "#8A8794"; });
+    rows.forEach((r, i) => {
+      r.track.style.transform = `scaleX(${outExpo(P(t, S3_IN + 0.1 + i * 0.06, S3_IN + 0.6 + i * 0.06))})`;
+      r.fill.style.transform = `scaleX(${clamp((x - r.x0) / (r.x1 - r.x0))})`;
+      riseWords(r.head, t, r.arrive, 0.05, 0.45);
+      r.detail.style.opacity = P(t, r.arrive + 0.25, r.arrive + 0.5);
+    });
+  }
+
+  // --- Scene 4: what you get ---
+  if (t >= WIPE2 && t < WIPE3) {
+    $("#s4lab").style.opacity = P(t, 14.7, 14.9);
+    gets.forEach((g) => {
+      const a = outExpo(P(t, g.at, g.at + 0.45));
+      g.n.style.opacity = a;
+      g.n.style.transform = `translateX(${-40 * (1 - a)}px)`;
+      riseWords(g.t, t, g.at + 0.05, 0.06, 0.5);
+      g.rule.style.transform = `scaleX(${outExpo(P(t, g.at + 0.1, g.at + 0.8))})`;
+    });
+  }
+
+  // --- Scene 5: price and effort ---
+  if (t >= WIPE3 && t < S6_IN) {
+    riseWords(s5a, t, 18.85, 0.12, 0.55);
+    const slam = outExpo(P(t, 19.15, 19.45));
+    $("#price").style.opacity = slam;
+    $("#price").style.transform = `scale(${lerp(1.35, 1, slam)})`;
+    $("#flash").style.opacity = (1 - P(t, 19.2, 20.0)) * P(t, 19.1, 19.2) * 0.8;
+    $("#priceNote").style.opacity = P(t, 19.5, 19.8);
+    riseWords(s5b, t, 19.8, 0.06, 0.5);
+    const out = inExpo(P(t, S6_IN - 0.3, S6_IN));
+    $("#s5").style.opacity = 1 - out;
+    $("#s5").style.transform = `scale(${1 - 0.05 * out})`;
+  } else {
+    $("#flash").style.opacity = 0;
+  }
+
+  // --- Scene 6: end card ---
+  if (t >= S6_IN) renderEndCard(t, S6_IN);
+}
+
+boot(renderAt, DURATION);
+</script>
+</body>
+</html>

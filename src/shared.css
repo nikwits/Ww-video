@@ -1,0 +1,42 @@
+/* Shared brand styles for every Wits + Watts video. */
+@font-face { font-family: "Spectral"; font-style: italic; font-weight: 400;
+  src: url(/node_modules/@fontsource/spectral/files/spectral-latin-400-italic.woff2) format("woff2"); }
+@font-face { font-family: "Plex Mono"; font-style: normal; font-weight: 400;
+  src: url(/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "Plex Mono"; font-style: normal; font-weight: 500;
+  src: url(/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2) format("woff2"); }
+
+:root {
+  --ink: #0F0E14;
+  --paper: #ECEAF2;
+  --mute: #8A8794;
+  --signal: #C4197C;
+  --signal-hi: #EC5BA8;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--ink); color: var(--paper); }
+.serif { font-family: "Spectral", serif; font-style: italic; font-weight: 400; }
+.mono  { font-family: "Plex Mono", monospace; font-weight: 400; }
+.pink  { color: var(--signal-hi); }
+
+#bg { position: absolute; inset: 0; }
+#vignette { position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%); }
+.scene { position: absolute; inset: 0; visibility: hidden; }
+
+/* word-mask reveal */
+.w  { display: inline-block; overflow: hidden; vertical-align: top; padding: 0 .06em .14em; margin: 0 -.06em -.14em; }
+.wi { display: inline-block; will-change: transform; }
+
+/* end card */
+#logo { position: absolute; left: 0; right: 0; top: 330px; display: flex; justify-content: center; align-items: baseline; font-size: 176px; line-height: 1.2; }
+#logo span { display: inline-block; }
+#lp { color: var(--signal-hi); margin: 0 .32em; font-size: .9em; }
+#cta { position: absolute; left: 50%; top: 650px; transform: translateX(-50%); }
+#ctaBox { position: relative; display: inline-block; padding: 24px 52px; border: 2px solid var(--signal-hi); border-radius: 999px; font-size: 38px; overflow: hidden; white-space: nowrap; }
+#ctaFill { position: absolute; inset: 0; background: var(--signal); transform-origin: left center; }
+#ctaTxt { position: relative; }
+#url { position: absolute; left: 0; right: 0; top: 820px; text-align: center; font-size: 30px; letter-spacing: .12em; color: var(--mute); }
+
+#wipe { position: absolute; inset: 0; background: var(--signal); transform: translateX(-100%); }
+#flash { position: absolute; inset: 0; background: radial-gradient(circle at 50% 42%, rgba(236,91,168,.55), rgba(236,91,168,0) 45%); opacity: 0; }
