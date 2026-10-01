@@ -29,4 +29,15 @@ Silent 1920x1080 brand videos. Every frame is a pure function of time in `src/<n
 | 18.7 to 21.4s | "Fixed fee. From $9,500" NZD excl. GST. "About 12 hours of your leadership's time." |
 | 21.4 to 25s | Logo, "Book a 30-minute call", witsandwatts.ai |
 
+## Transcribing with Whisper
+
+`transcribe.mjs` sends audio or video to OpenAI's Whisper and saves the transcript to `out/transcripts/`.
+
+- Get an API key at https://platform.openai.com/api-keys, then `export OPENAI_API_KEY=sk-...`
+- `node transcribe.mjs voiceover.m4a` writes `out/transcripts/voiceover.srt` (timed captions)
+- `--format text` for plain text, `vtt` for web captions, `json` for raw output
+- `--language en` skips language detection, `--prompt "..."` teaches it names and jargon (defaults to Wits + Watts terms)
+- Video files and anything over 25MB get their audio pulled out with ffmpeg first. Up to about 50 minutes per file
+- Costs about US$0.006 a minute, so an hour-long call is roughly 36 cents
+
 Brand: Signal #C4197C, Ink #0F0E14, Spectral Italic 400 and IBM Plex Mono.
